@@ -55,7 +55,16 @@
      java -jar sentinel-dashboard-1.8.2.jar
      ```
 
-4. Test http://localhost/job/test
+4. Launch all microservices
+
+   - candidate-service
+   - company-service
+   - job-service
+   - gateway 
+   - sentinel-service
+   - config
+
+5. Test http://localhost/job/test
 
    succeed if the following returned:
 
