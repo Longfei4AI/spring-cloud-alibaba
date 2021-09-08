@@ -21,14 +21,18 @@
 
      - Add new file
 
-       ```
-       Data ID: nacos-config-dev.yaml
-       Group: DEFAULT_GROUP
-       Format: YAML
+       Data ID: `nacos-config-dev.yaml`
+
+       Group: `DEFAULT_GROUP`
+
+       Format: `YAML`
+
        Configuration Content: 
-       	user:
-           name: Lily
-           age: 28
+
+       ```
+       user:
+         name: Lily
+         age: 28
        ```
 
        
