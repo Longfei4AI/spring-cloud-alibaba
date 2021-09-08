@@ -57,7 +57,7 @@
 
 4. Test http://localhost/job/test
 
-   succeed if the following retured:
+   succeed if the following returned:
 
    ```
    {"id":1,"name":"Tom","age":30}
