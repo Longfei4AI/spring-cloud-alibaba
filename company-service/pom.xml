@@ -3,8 +3,8 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>springcloud-apn-demo</artifactId>
-        <groupId>com.apn</groupId>
+        <artifactId>springcloud-alibaba</artifactId>
+        <groupId>com.altomni.apn</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -70,7 +70,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.apn</groupId>
+            <groupId>com.altomni.apn</groupId>
             <artifactId>common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
