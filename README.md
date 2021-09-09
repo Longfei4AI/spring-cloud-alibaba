@@ -5,7 +5,7 @@
    - Mac with M1: 
 
      ```
-     docker run --name nacos -e MODE=standalone -p 8848:8848 -d zill057/nacos-server-apple-silicon:2.0.3
+     docker run --name nacos -e MODE=standalone -p 8848:8848 -p 9848:9848 -p 9849:9849 -d zill057/nacos-server-apple-silicon:2.0.3
 
    - Mac with Intel: 
 
