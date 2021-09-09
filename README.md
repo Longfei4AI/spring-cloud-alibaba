@@ -13,6 +13,8 @@
      docker run --name nacos -e MODE=standalone -p 8848:8848 -d nacos/nacos-server:2.0.2
      ```
 
+   - Visit dashboard: http://localhost:8848/
+
    - Add initial config file
 
      - Open http://localhost:8848/
@@ -43,6 +45,8 @@
    docker run -d -p 9411:9411 --name zipkin openzipkin/zipkin
    ```
 
+   - Visit dashboard: http://localhost:9411/
+
 3. Install Sentinel Dashboard
 
    - Download jar
@@ -54,6 +58,8 @@
      ```
      java -jar sentinel-dashboard-1.8.2.jar
      ```
+
+   - Visit dashboard: http://localhost:8080/
 
 4. Launch all microservices
 
