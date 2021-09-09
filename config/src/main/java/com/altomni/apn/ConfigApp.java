@@ -1,4 +1,4 @@
-package com.apn;
+package com.altomni.apn;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

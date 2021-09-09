@@ -1,7 +1,7 @@
-package com.apn.controller;
+package com.altomni.apn.controller;
 
-import com.apn.entity.Candidate;
-import com.apn.service.CandidateService;
+import com.altomni.apn.entity.Candidate;
+import com.altomni.apn.service.CandidateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

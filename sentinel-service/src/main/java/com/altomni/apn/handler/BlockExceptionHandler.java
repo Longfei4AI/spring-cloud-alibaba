@@ -1,4 +1,4 @@
-package com.apn.handler;
+package com.altomni.apn.handler;
 
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 

@@ -1,6 +1,6 @@
-package com.apn.service;
+package com.altomni.apn.service;
 
-import com.apn.entity.Candidate;
+import com.altomni.apn.entity.Candidate;
 import org.springframework.stereotype.Service;
 
 @Service

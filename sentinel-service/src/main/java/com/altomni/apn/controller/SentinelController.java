@@ -1,8 +1,8 @@
-package com.apn.controller;
+package com.altomni.apn.controller;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
-import com.apn.handler.BlockExceptionHandler;
+import com.altomni.apn.handler.BlockExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

@@ -1,4 +1,4 @@
-package com.apn.filter;
+package com.altomni.apn.filter;
 
 import io.netty.util.internal.StringUtil;
 import org.apache.commons.lang.StringUtils;

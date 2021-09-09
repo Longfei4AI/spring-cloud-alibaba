@@ -1,4 +1,4 @@
-package com.apn.entity;
+package com.altomni.apn.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
