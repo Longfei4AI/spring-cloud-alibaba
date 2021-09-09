@@ -10,14 +10,14 @@
    - Mac with Intel: 
 
      ```
-     docker run --name nacos -e MODE=standalone -p 8848:8848 -d nacos/nacos-server:2.0.2
+     docker run --name nacos -e MODE=standalone -p 8848:8848 -p 9848:9848 -p 9849:9849  -d nacos/nacos-server:2.0.2
      ```
 
-   - Visit dashboard: http://localhost:8848/
+   - Visit dashboard: http://localhost:8848/nacos
 
    - Add initial config file
 
-     - Open http://localhost:8848/
+     - Open http://localhost:8848/nacos
 
      - Click `ConfigManagement` --> `Configurations`
 
@@ -45,7 +45,7 @@
    docker run -d -p 9411:9411 --name zipkin openzipkin/zipkin
    ```
 
-   - Visit dashboard: http://localhost:9411/
+   - Visit dashboard: http://localhost:9411/zipkin
 
 3. Install Sentinel Dashboard
 
@@ -59,7 +59,7 @@
      java -jar sentinel-dashboard-1.8.2.jar
      ```
 
-   - Visit dashboard: http://localhost:8080/
+   - Visit dashboard: http://localhost:8080/#/dashboard/home
 
 4. Launch all microservices
 
