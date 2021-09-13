@@ -1,7 +1,7 @@
-package com.altomni.apn.controller;
+package com.altomni.apn.web.rest;
 
 import com.altomni.apn.service.CandidateService;
-import com.altomni.apn.entity.Candidate;
+import com.altomni.apn.domain.Candidate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +11,7 @@ import javax.annotation.Resource;
 
 @RestController
 @Slf4j
-public class CompanyController {
+public class CompanyResource {
 
     @Resource
     private CandidateService candidateService;

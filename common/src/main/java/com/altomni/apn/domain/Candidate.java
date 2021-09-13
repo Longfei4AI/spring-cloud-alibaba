@@ -1,4 +1,4 @@
-package com.altomni.apn.entity;
+package com.altomni.apn.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

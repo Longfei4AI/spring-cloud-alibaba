@@ -1,4 +1,4 @@
-package com.altomni.apn.controller;
+package com.altomni.apn.web.rest;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;

@@ -1,6 +1,6 @@
-package com.altomni.apn.controller;
+package com.altomni.apn.web.rest;
 
-import com.altomni.apn.entity.Candidate;
+import com.altomni.apn.domain.Candidate;
 import com.altomni.apn.service.CompanyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
