@@ -1,8 +1,6 @@
 package com.altomni.apn.authority.service;
 
 import cn.hutool.core.util.RandomUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.altomni.apn.authority.config.Constants;
 import com.altomni.apn.authority.domain.Authority;
 import com.altomni.apn.authority.domain.User;
@@ -11,11 +9,11 @@ import com.altomni.apn.authority.exception.InvalidPasswordException;
 import com.altomni.apn.authority.exception.UsernameAlreadyUsedException;
 import com.altomni.apn.authority.repository.AuthorityRepository;
 import com.altomni.apn.authority.repository.UserRepository;
-import com.altomni.apn.authority.security.AuthoritiesConstants;
-import com.altomni.apn.authority.security.SecurityUtils;
+import com.altomni.apn.authority.utils.SecurityUtils;
 import com.altomni.apn.authority.service.dto.AdminUserDTO;
 import com.altomni.apn.authority.service.dto.UserDTO;
 import com.altomni.apn.authority.web.rest.vm.LoginVM;
+import com.altomni.apn.common.config.AuthoritiesConstants;
 import com.altomni.apn.common.dto.CredentialDTO;
 import com.altomni.apn.common.dto.LoginUserDTO;
 import com.altomni.apn.common.errors.CustomParameterizedException;
@@ -37,7 +35,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.Resource;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;

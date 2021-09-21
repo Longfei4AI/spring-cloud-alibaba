@@ -74,10 +74,7 @@
    Password: 
 
    ```
-   create database apn_authority;
-   create database apn_candidate;
-   create database apn_company;
-   create database apn_job;
+   create database apn_v3;
    ```
 
    

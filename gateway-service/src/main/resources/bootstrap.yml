@@ -8,3 +8,5 @@ spring:
         file-extension: yaml
         #prefix: application
         namespace: ${namespace:dev}
+        shared-configs: public-spring-cloud.yaml
+        refresh-enabled: true
