@@ -63,7 +63,7 @@
 
      Configuration Content: 
 
-     ​	Copy the files content from [config->main->resource/**]
+     ​		Copy the files' content from [config->main->resource/**]
 
    
 
