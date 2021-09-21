@@ -1,6 +1,7 @@
 package com.altomni.apn.job.web.rest;
 
 import com.altomni.apn.job.service.CompanyService;
+import com.altomni.apn.job.utils.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,7 @@ public class JobResourceTest {
     @GetMapping("/test")
     public ResponseEntity<Object> getJobs(){
         log.info("request to get jobs ----");
+        log.info(SecurityUtils.getCurrentUserLogin().toString());
         return companyService.getCompany();
     }
 }

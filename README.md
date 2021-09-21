@@ -136,7 +136,12 @@
      - Succeed if the following returned:
 
        ```
-       {"id":1,"name":"Longfei","age":30}
+       {
+           "id": 1,
+           "name": "Longfei",
+           "age": 30,
+           "status": 1
+       }
        ```
 
        

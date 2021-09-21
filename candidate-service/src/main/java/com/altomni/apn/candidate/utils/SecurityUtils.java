@@ -1,11 +1,12 @@
 package com.altomni.apn.candidate.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.altomni.apn.common.config.AuthoritiesConstants;
+import com.altomni.apn.common.dto.LoginUserDTO;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -24,21 +25,16 @@ public final class SecurityUtils {
      *
      * @return the login of the current user.
      */
-    public static Optional<String> getCurrentUserLogin() {
+    public static Optional<LoginUserDTO> getCurrentUserLogin() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         return Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));
     }
 
-    private static String extractPrincipal(Authentication authentication) {
+    private static LoginUserDTO extractPrincipal(Authentication authentication) {
         if (authentication == null) {
             return null;
-        } else if (authentication.getPrincipal() instanceof UserDetails) {
-            UserDetails springSecurityUser = (UserDetails) authentication.getPrincipal();
-            return springSecurityUser.getUsername();
-        } else if (authentication.getPrincipal() instanceof String) {
-            return (String) authentication.getPrincipal();
         }
-        return null;
+        return JSON.parseObject(authentication.getPrincipal().toString(), LoginUserDTO.class);
     }
 
     /**
@@ -80,21 +76,11 @@ public final class SecurityUtils {
     }
 
     public static Long getTenantId() {
-        try {
-            return Long.valueOf(SecurityUtils.getCurrentUserLogin().get().split(",")[1]);
-        } catch (Exception e) {
-            //TODO: log exception
-            return -1L;
-        }
+        return SecurityUtils.getCurrentUserLogin().get().getTenantId();
     }
 
     public static Long getUserId() {
-        try {
-            return Long.valueOf(SecurityUtils.getCurrentUserLogin().get().split(",")[0]);
-        } catch (Exception e) {
-            //TODO: log exception
-            return -1L;
-        }
+        return SecurityUtils.getCurrentUserLogin().get().getId();
     }
 
     public static boolean hasLogin(long userId){

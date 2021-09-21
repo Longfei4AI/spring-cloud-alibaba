@@ -21,6 +21,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
@@ -48,6 +49,12 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
+
+    @Value("${oauth2.secret}")
+    private String secret;
+
+    @Value("${server.port}")
+    private String port;
 
     private final UserRepository userRepository;
 
@@ -80,10 +87,10 @@ public class UserService {
                 throw new CustomParameterizedException("Inactive user is not allowed to login");
             }
             try {
-                String tokenUrl = "http://127.0.0.1:20000" + "/authority/oauth/token";
+                String tokenUrl = String.format("http://localhost:%s/authority/oauth/token", port);
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                headers.add("Authorization", "Basic YXBpYXBwOkI1OmhSJ05eNSlKS04/RWo=");
+                headers.add("Authorization", String.format("Basic %s", secret));
 
                 MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
                 map.add("username", loginVM.getUsername());
@@ -307,8 +314,7 @@ public class UserService {
      * @param imageUrl  image URL of user.
      */
     public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
-        SecurityUtils
-            .getCurrentUserLogin()
+        Optional.of(SecurityUtils.getCurrentUserLogin().get().getUsername())
             .flatMap(userRepository::findOneByUsername)
             .ifPresent(
                 user -> {
@@ -327,8 +333,7 @@ public class UserService {
 
     @Transactional
     public void changePassword(String currentClearTextPassword, String newPassword) {
-        SecurityUtils
-            .getCurrentUserLogin()
+        Optional.of(SecurityUtils.getCurrentUserLogin().get().getUsername())
             .flatMap(userRepository::findOneByUsername)
             .ifPresent(
                 user -> {
@@ -361,7 +366,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthorities() {
-        return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneWithAuthoritiesByUsername);
+        return Optional.of(SecurityUtils.getCurrentUserLogin().get().getUsername()).flatMap(userRepository::findOneWithAuthoritiesByUsername);
     }
 
     /**

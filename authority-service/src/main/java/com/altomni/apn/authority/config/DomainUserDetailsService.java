@@ -30,8 +30,6 @@ public class DomainUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
         log.info("Authenticating {}", username);
-        //log.warn(new BCryptPasswordEncoder().encode("B5:hR'N^5)JKN?Ej")); $2a$10$3AdVxOJHqBLEb1UceCiwterM22E.EUjOUu117JHxbMp3QI8PuwK2m
-        //log.warn(new BCryptPasswordEncoder().encode("123456")); $2a$10$pgDeeVJie8UVGXJ9itCoguuW0UT27Mr8ZvlTSG1LpaRvGq4treMnG
 
         if (new EmailValidator().isValid(username, null)) {
             return userRepository
