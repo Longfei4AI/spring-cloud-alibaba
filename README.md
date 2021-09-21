@@ -129,7 +129,7 @@
 
    - Test API
 
-     - Access GET http://localhost/job/test with Authorization in Request Header, like:
+     - Access GET http://localhost/job/api/v3/test with Authorization in Request Header, like:
 
        Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5c......
 
