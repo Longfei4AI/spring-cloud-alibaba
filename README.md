@@ -15,29 +15,7 @@
 
    - Visit dashboard: http://localhost:8848/nacos
 
-   - Add initial config file
-
-     - Open http://localhost:8848/nacos
-
-     - Click `ConfigManagement` --> `Configurations`
-
-     - Add new file
-
-       Data ID: `nacos-config-dev.yaml`
-
-       Group: `DEFAULT_GROUP`
-
-       Format: `YAML`
-
-       Configuration Content: 
-
-       ```
-       user:
-         name: Lily
-         age: 28
-       ```
-
-       
+     
 
 2. Install Zipkin
 
@@ -67,9 +45,44 @@
 
    - Visit dashboard: http://localhost:8088/#/dashboard/home
 
-4. On Nacos' page, create 3 namespaces (prod, staging, dev) and add yaml config files to them [ConfigManagement->Configurations]. Your can find referrence files in our project. [config->main->resource/**]
+4. Create namespaces and add  yaml configurations:
 
-5. Launch all microservices
+   - Open http://localhost:8848/nacos
+
+   - Click `Namespace`, create 3 namespaces (prod, staging, dev)
+
+   - Click `ConfigManagement` --> `Configurations` --> `dev`
+
+   - Add a new configuration for each microservice
+
+     Data ID:  Refer to the files' name from [config->main->resource/**]
+
+     Group: `DEFAULT_GROUP`
+
+     Format: `YAML`
+
+     Configuration Content: 
+
+     ​	Copy the files content from [config->main->resource/**]
+
+   
+
+5. Create database 
+
+   Username: root
+
+   Password: 
+
+   ```
+   create database apn_authority;
+   create database apn_candidate;
+   create database apn_company;
+   create database apn_job;
+   ```
+
+   
+
+6. Launch all microservices
 
    - gateway-service
    - authority-service
@@ -77,13 +90,63 @@
    - company-service
    - job-service
 
-6. Test http://localhost/job/test
+7. Test 
 
-   succeed if the following returned:
+   - Test Login
 
-   ```
-   {"id":1,"name":"Tom","age":30}
-   ```
+     Access POST http://localhost/authority/api/v3/login with the request body below:
+
+     ```
+     {
+         "username": "longfei",
+         "password": 123456
+     }
+     ```
+
+     Response body:
+
+     ```
+     {
+         "id": 1,
+         "username": "longfei",
+         "firstName": "Longfei",
+         "lastName": "Wang",
+         "email": "longfei.wang@altomni.com",
+         "activated": true,
+         "langKey": "EN",
+         "imageUrl": "",
+         "credit": null,
+         "phone": null,
+         "tenantId": null,
+         "divisionId": null,
+         "credential": {
+             "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6I...",
+             "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6I...",
+             "scope": "read write",
+             "expires_in": 7199
+         }
+     }
+     ```
+
+     
+
+   - Test API
+
+     - Access GET http://localhost/job/test with Authorization in Request Header, like:
+
+       Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5c......
+
+     - Succeed if the following returned:
+
+       ```
+       {"id":1,"name":"Longfei","age":30}
+       ```
+
+       
+
+     
+
+     
 
    
 
