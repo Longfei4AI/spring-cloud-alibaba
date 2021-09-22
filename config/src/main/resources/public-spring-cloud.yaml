@@ -3,6 +3,7 @@ spring:
     nacos:
       discovery:
         server-addr: localhost:8848
+        namespace: staging
     sentinel:
       transport:
         dashboard: localhost:8088
@@ -25,6 +26,29 @@ spring:
 feign:
   sentinel:
     enabled: true
+
+seata:
+  enabled: true
+  tx-service-group: apn_tx_group
+  enable-auto-data-source-proxy: true
+  config:
+    type: nacos
+    nacos:
+      server-addr: localhost:8848
+      namespace: staging
+      group: DEFAULT_GROUP
+      username: nacos
+      password: nacos
+      data-id: apn_tx_group.properties
+  registry:
+    type: nacos
+    nacos:
+      application: seata-server
+      server-addr: localhost:8848
+      namespace: staging
+      group: DEFAULT_GROUP
+      username: nacos
+      password: nacos
 
 management:
   endpoints:
