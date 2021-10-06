@@ -3,16 +3,18 @@ package com.altomni.apn.candidate.web.rest;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.altomni.apn.candidate.handler.BlockExceptionHandler;
-import com.altomni.apn.candidate.service.dto.CandidateDTO;
 import com.altomni.apn.candidate.service.CandidateService;
+import com.altomni.apn.candidate.service.dto.CandidateDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -24,6 +26,12 @@ public class CandidateResourceTest {
     @Resource
     private CandidateService candidateService;
 
+    @Resource
+    private ConnectionFactory connectionFactory;
+
+    @Resource
+    private RabbitTemplate rabbitTemplate;
+
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/test")
     public ResponseEntity<CandidateDTO> test(){
@@ -31,7 +39,18 @@ public class CandidateResourceTest {
         //UserDTO userDTO = (UserDTO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         log.info(principal.toString());
-        return ResponseEntity.ok(candidateService.findOne(1L).get());
+        CandidateDTO candidateDTO = candidateService.findOne(1L).get();
+        log.info(candidateDTO.toString());
+        return ResponseEntity.ok(candidateDTO);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping("/save")
+    public ResponseEntity<CandidateDTO> saveTest(){
+        log.info("request to save Candidate");
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.info(principal.toString());
+        return ResponseEntity.ok(candidateService.save(new CandidateDTO(null, "Tom", 18, 1)));
     }
 
     @GetMapping("/test-a")
@@ -59,5 +78,15 @@ public class CandidateResourceTest {
     @SentinelResource(value = "myCustomHandler", blockHandlerClass = BlockExceptionHandler.class, blockHandler = "myHandler1")
     public String testC(){
         return "test C";
+    }
+
+    @GetMapping("/test-mq-publisher")
+    public String testMQPublisher(){
+        String queueName = "candidate-queue";
+        String message = "This is my first message";
+        AmqpAdmin amqpAdmin = new RabbitAdmin(connectionFactory);
+        amqpAdmin.declareQueue(new Queue(queueName));
+        rabbitTemplate.convertAndSend(queueName, message);
+        return "test-mq-publisher";
     }
 }

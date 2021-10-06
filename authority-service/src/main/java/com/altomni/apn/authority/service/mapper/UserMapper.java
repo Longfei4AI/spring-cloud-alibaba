@@ -2,7 +2,6 @@ package com.altomni.apn.authority.service.mapper;
 
 import com.altomni.apn.authority.domain.Authority;
 import com.altomni.apn.authority.domain.User;
-import com.altomni.apn.authority.service.dto.AdminUserDTO;
 import com.altomni.apn.authority.service.dto.UserDTO;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapping;
@@ -29,19 +28,19 @@ public class UserMapper {
         return new UserDTO(user);
     }
 
-    public List<AdminUserDTO> usersToAdminUserDTOs(List<User> users) {
+    public List<UserDTO> usersToAdminUserDTOs(List<User> users) {
         return users.stream().filter(Objects::nonNull).map(this::userToAdminUserDTO).collect(Collectors.toList());
     }
 
-    public AdminUserDTO userToAdminUserDTO(User user) {
-        return new AdminUserDTO(user);
+    public UserDTO userToAdminUserDTO(User user) {
+        return new UserDTO(user);
     }
 
-    public List<User> userDTOsToUsers(List<AdminUserDTO> userDTOs) {
+    public List<User> userDTOsToUsers(List<UserDTO> userDTOs) {
         return userDTOs.stream().filter(Objects::nonNull).map(this::userDTOToUser).collect(Collectors.toList());
     }
 
-    public User userDTOToUser(AdminUserDTO userDTO) {
+    public User userDTOToUser(UserDTO userDTO) {
         if (userDTO == null) {
             return null;
         } else {
@@ -53,7 +52,6 @@ public class UserMapper {
             user.setEmail(userDTO.getEmail());
             user.setImageUrl(userDTO.getImageUrl());
             user.setActivated(userDTO.isActivated());
-            user.setLangKey(userDTO.getLangKey());
             Set<Authority> authorities = this.authoritiesFromStrings(userDTO.getAuthorities());
             user.setAuthorities(authorities);
             return user;

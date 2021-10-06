@@ -18,6 +18,16 @@ public class CompanyDTO implements Serializable {
 
     private Integer status;
 
+    public CompanyDTO() {
+    }
+
+    public CompanyDTO(Long id, String name, Integer employees, Integer status) {
+        this.id = id;
+        this.name = name;
+        this.employees = employees;
+        this.status = status;
+    }
+
     public Long getId() {
         return id;
     }

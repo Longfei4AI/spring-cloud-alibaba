@@ -24,6 +24,16 @@ public class CandidateDTO implements Serializable {
 
     private Integer status;
 
+    public CandidateDTO() {
+    }
+
+    public CandidateDTO(Long id, String name, Integer age, Integer status) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.status = status;
+    }
+
     public Long getId() {
         return id;
     }

@@ -1,9 +1,9 @@
 package com.altomni.apn.candidate.service;
 
-import com.altomni.apn.candidate.service.dto.CandidateDTO;
-import com.altomni.apn.candidate.service.mapper.CandidateMapper;
 import com.altomni.apn.candidate.domain.Candidate;
 import com.altomni.apn.candidate.repository.CandidateRepository;
+import com.altomni.apn.candidate.service.dto.CandidateDTO;
+import com.altomni.apn.candidate.service.mapper.CandidateMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -38,7 +38,7 @@ public class CandidateService {
      * @return the persisted entity.
      */
     public CandidateDTO save(CandidateDTO candidateDTO) {
-        log.debug("Request to save Candidate : {}", candidateDTO);
+        log.info("Request to save Candidate : {}", candidateDTO);
         Candidate candidate = candidateMapper.toEntity(candidateDTO);
         candidate = candidateRepository.save(candidate);
         return candidateMapper.toDto(candidate);
@@ -58,7 +58,6 @@ public class CandidateService {
             .map(
                 existingCandidate -> {
                     candidateMapper.partialUpdate(existingCandidate, candidateDTO);
-
                     return existingCandidate;
                 }
             )
@@ -86,7 +85,7 @@ public class CandidateService {
      */
     @Transactional(readOnly = true)
     public Optional<CandidateDTO> findOne(Long id) {
-        log.debug("Request to get Candidate : {}", id);
+        log.info("Request to get Candidate : {}", id);
         return candidateRepository.findById(id).map(candidateMapper::toDto);
     }
 
@@ -96,7 +95,7 @@ public class CandidateService {
      * @param id the id of the entity.
      */
     public void delete(Long id) {
-        log.debug("Request to delete Candidate : {}", id);
+        log.info("Request to delete Candidate : {}", id);
         candidateRepository.deleteById(id);
     }
 }

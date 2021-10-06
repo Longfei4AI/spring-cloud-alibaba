@@ -1,7 +1,6 @@
 package com.altomni.apn.authority.service;
 
 import cn.hutool.core.util.RandomUtil;
-import com.altomni.apn.authority.config.Constants;
 import com.altomni.apn.authority.domain.Authority;
 import com.altomni.apn.authority.domain.User;
 import com.altomni.apn.authority.exception.EmailAlreadyUsedException;
@@ -9,113 +8,41 @@ import com.altomni.apn.authority.exception.InvalidPasswordException;
 import com.altomni.apn.authority.exception.UsernameAlreadyUsedException;
 import com.altomni.apn.authority.repository.AuthorityRepository;
 import com.altomni.apn.authority.repository.UserRepository;
-import com.altomni.apn.authority.utils.SecurityUtils;
-import com.altomni.apn.authority.service.dto.AdminUserDTO;
 import com.altomni.apn.authority.service.dto.UserDTO;
-import com.altomni.apn.authority.web.rest.vm.LoginVM;
+import com.altomni.apn.authority.utils.SecurityUtils;
 import com.altomni.apn.common.config.AuthoritiesConstants;
-import com.altomni.apn.common.dto.CredentialDTO;
-import com.altomni.apn.common.dto.LoginUserDTO;
-import com.altomni.apn.common.errors.CustomParameterizedException;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Resource;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * Service class for managing users.
+ * @author longfeiwang
  */
+@Slf4j
 @Service
-@Transactional
-public class UserService {
+@Transactional(rollbackFor = Exception.class)
+public class UserService extends UserSecurityService {
 
-    private final Logger log = LoggerFactory.getLogger(UserService.class);
+    @Resource
+    private UserRepository userRepository;
 
-    @Value("${oauth2.secret}")
-    private String secret;
+    @Resource
+    private PasswordEncoder passwordEncoder;
 
-    @Value("${server.port}")
-    private String port;
-
-    private final UserRepository userRepository;
-
-    private final PasswordEncoder passwordEncoder;
-
-    private final AuthorityRepository authorityRepository;
-
-    private final RestTemplate restTemplate;
-
-    public UserService(
-        UserRepository userRepository,
-        PasswordEncoder passwordEncoder,
-        AuthorityRepository authorityRepository,
-        RestTemplate restTemplate
-    ) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.authorityRepository = authorityRepository;
-        this.restTemplate = restTemplate;
-    }
-
-    /**
-     * User login. Call the oauth2 login api and return user profile
-     * @param loginVM username and password
-     * @return jsonObject access token & refresh token
-     */
-    public LoginUserDTO login(LoginVM loginVM) {
-        return this.getUserWithAuthoritiesByLogin(loginVM.getUsername()).map(user -> {
-            if (!user.isActivated()) {
-                throw new CustomParameterizedException("Inactive user is not allowed to login");
-            }
-            try {
-                String tokenUrl = String.format("http://localhost:%s/authority/oauth/token", port);
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                headers.add("Authorization", String.format("Basic %s", secret));
-
-                MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
-                map.add("username", loginVM.getUsername());
-                map.add("password", loginVM.getPassword());
-                map.add("grant_type", "password");
-
-                HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
-
-                ResponseEntity<CredentialDTO> response = restTemplate.postForEntity(tokenUrl, request, CredentialDTO.class);
-
-                CredentialDTO credentialDTO = response.getBody();
-
-                LoginUserDTO loginUserDTO = new LoginUserDTO();
-
-                BeanUtils.copyProperties(user, loginUserDTO);
-
-                loginUserDTO.setCredential(credentialDTO);
-
-                return loginUserDTO;
-            } catch (Exception e) {
-                log.error("[UserService.login] Login user {}, exception {}", loginVM, ExceptionUtils.getStackTrace(e));
-                throw new CustomParameterizedException("The username and password do not match.");
-            }
-        }).orElseThrow(() -> new CustomParameterizedException("The username and password do not match."));
-    }
+    @Resource
+    private AuthorityRepository authorityRepository;
 
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
@@ -163,7 +90,7 @@ public class UserService {
             );
     }
 
-    public User registerUser(AdminUserDTO userDTO, String password) {
+    public User registerUser(UserDTO userDTO, String password) {
         userRepository
             .findOneByUsername(userDTO.getUsername().toLowerCase())
             .ifPresent(
@@ -195,7 +122,6 @@ public class UserService {
             newUser.setEmail(userDTO.getEmail().toLowerCase());
         }
         newUser.setImageUrl(userDTO.getImageUrl());
-        newUser.setLangKey(userDTO.getLangKey());
         // new user is not active
         newUser.setActivated(false);
         // new user gets registration key
@@ -217,7 +143,7 @@ public class UserService {
         return true;
     }
 
-    public User createUser(AdminUserDTO userDTO) {
+    public User createUser(UserDTO userDTO) {
         User user = new User();
         user.setUsername(userDTO.getUsername().toLowerCase());
         user.setFirstName(userDTO.getFirstName());
@@ -226,11 +152,7 @@ public class UserService {
             user.setEmail(userDTO.getEmail().toLowerCase());
         }
         user.setImageUrl(userDTO.getImageUrl());
-        if (userDTO.getLangKey() == null) {
-            user.setLangKey(Constants.DEFAULT_LANGUAGE); // default language
-        } else {
-            user.setLangKey(userDTO.getLangKey());
-        }
+
         String encryptedPassword = passwordEncoder.encode(RandomUtil.randomNumbers(20));
         user.setPassword(encryptedPassword);
         user.setResetKey(RandomUtil.randomNumbers(20));
@@ -258,7 +180,7 @@ public class UserService {
      * @param userDTO user to update.
      * @return updated user.
      */
-    public Optional<AdminUserDTO> updateUser(AdminUserDTO userDTO) {
+    public Optional<UserDTO> updateUser(UserDTO userDTO) {
         return Optional
             .of(userRepository.findById(userDTO.getId()))
             .filter(Optional::isPresent)
@@ -274,7 +196,6 @@ public class UserService {
                     }
                     user.setImageUrl(userDTO.getImageUrl());
                     user.setActivated(userDTO.isActivated());
-                    user.setLangKey(userDTO.getLangKey());
                     Set<Authority> managedAuthorities = user.getAuthorities();
                     managedAuthorities.clear();
                     userDTO
@@ -289,7 +210,7 @@ public class UserService {
                     return user;
                 }
             )
-            .map(AdminUserDTO::new);
+            .map(UserDTO::new);
     }
 
     public void deleteUser(String login) {
@@ -310,10 +231,9 @@ public class UserService {
      * @param firstName first name of user.
      * @param lastName  last name of user.
      * @param email     email id of user.
-     * @param langKey   language key.
      * @param imageUrl  image URL of user.
      */
-    public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
+    public void updateUser(String firstName, String lastName, String email, String imageUrl) {
         Optional.of(SecurityUtils.getCurrentUserLogin().get().getUsername())
             .flatMap(userRepository::findOneByUsername)
             .ifPresent(
@@ -323,7 +243,6 @@ public class UserService {
                     if (email != null) {
                         user.setEmail(email.toLowerCase());
                     }
-                    user.setLangKey(langKey);
                     user.setImageUrl(imageUrl);
 
                     log.debug("Changed Information for User: {}", user);
@@ -350,8 +269,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<AdminUserDTO> getAllManagedUsers(Pageable pageable) {
-        return userRepository.findAll(pageable).map(AdminUserDTO::new);
+    public Page<UserDTO> getAllManagedUsers(Pageable pageable) {
+        return userRepository.findAll(pageable).map(UserDTO::new);
     }
 
     @Transactional(readOnly = true)
@@ -359,8 +278,9 @@ public class UserService {
         return userRepository.findAllByIdNotNullAndActivatedIsTrue(pageable).map(UserDTO::new);
     }
 
+    @Override
     @Transactional(readOnly = true)
-    public Optional<User> getUserWithAuthoritiesByLogin(String login) {
+    public Optional getUserWithAuthoritiesByLogin(String login) {
         return userRepository.findOneWithAuthoritiesByUsername(login);
     }
 
@@ -374,7 +294,7 @@ public class UserService {
      * <p>
      * This is scheduled to get fired everyday, at 01:00 (am).
      */
-    @Scheduled(cron = "0 0 1 * * ?")
+    /*@Scheduled(cron = "0 0 1 * * ?")
     public void removeNotActivatedUsers() {
         userRepository
             .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(Instant.now().minus(3, ChronoUnit.DAYS))
@@ -384,7 +304,7 @@ public class UserService {
                     userRepository.delete(user);
                 }
             );
-    }
+    }*/
 
     /**
      * Gets a list of all the authorities.

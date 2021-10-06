@@ -4,13 +4,16 @@ import com.altomni.apn.company.domain.Company;
 import com.altomni.apn.company.repository.CompanyRepository;
 import com.altomni.apn.company.service.dto.CompanyDTO;
 import com.altomni.apn.company.service.mapper.CompanyMapper;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.Optional;
 
 /**
@@ -25,6 +28,9 @@ public class CompanyService {
     private final CompanyRepository companyRepository;
 
     private final CompanyMapper companyMapper;
+
+    @Resource
+    private CandidateService candidateService;
 
     public CompanyService(CompanyRepository companyRepository, CompanyMapper companyMapper) {
         this.companyRepository = companyRepository;
@@ -42,6 +48,23 @@ public class CompanyService {
         Company company = companyMapper.toEntity(companyDTO);
         company = companyRepository.save(company);
         return companyMapper.toDto(company);
+    }
+
+    public ResponseEntity<Object> saveTest(CompanyDTO companyDTO) {
+        log.info("Request to save Company : {}", companyDTO);
+        Company company = companyMapper.toEntity(companyDTO);
+        companyRepository.save(company);
+        ResponseEntity<Object> response = candidateService.saveCandidate();
+        return response;
+    }
+
+    public ResponseEntity<Object> saveTestRollback(CompanyDTO companyDTO) {
+        log.info("Request to save Company : {}", companyDTO);
+        Company company = companyMapper.toEntity(companyDTO);
+        companyRepository.save(company);
+        ResponseEntity<Object> response = candidateService.saveCandidate();
+        int a = 1/0;
+        return response;
     }
 
     /**

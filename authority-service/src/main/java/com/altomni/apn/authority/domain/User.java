@@ -1,12 +1,15 @@
 package com.altomni.apn.authority.domain;
 
+import com.altomni.apn.authority.config.Constants;
+import com.altomni.apn.authority.domain.enumeration.AccountType;
+import com.altomni.apn.authority.domain.enumeration.AccountTypeConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.BatchSize;
-
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.Instant;
@@ -16,10 +19,11 @@ import java.util.Set;
 
 /**
  * A user.
+ * @author longfeiwang
  */
 @Entity
 @Table(name = "user")
-public class User extends AbstractAuditingEntity implements Serializable {
+public class User extends AbstractAuditingEntity implements UserSecurityInterface, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,16 +32,26 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private Long id;
 
     @NotNull
-    //@Pattern(regexp = Constants.LOGIN_REGEX)
+    @Convert(converter = AccountTypeConverter.class)
+    @Column(name = "account_type", nullable = false)
+    private AccountType accountType;
+
+    @NotNull
+    @Pattern(regexp = Constants.LOGIN_REGEX)
     @Size(min = 1, max = 50)
-    @Column(length = 50, unique = true, nullable = false)
+    @Column(length = 50, nullable = false)
     private String username;
 
-    @JsonIgnore
-    @NotNull
-    @Size(min = 60, max = 60)
-    @Column(length = 60, nullable = false)
-    private String password;
+    @Column(name = "tenant_id", nullable = false)
+    private Long tenantId;
+
+    @Email
+    @Size(min = 5, max = 254)
+    @Column(length = 254, unique = true)
+    private String email;
+
+    @Column(name = "phone")
+    private String phone;
 
     @Size(max = 50)
     @Column(name = "first_name", length = 50)
@@ -47,18 +61,15 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "last_name", length = 50)
     private String lastName;
 
-    @Email
-    @Size(min = 5, max = 254)
-    @Column(length = 254, unique = true)
-    private String email;
-
     @NotNull
     @Column(nullable = false)
     private boolean activated = false;
 
-    @Size(min = 2, max = 10)
-    @Column(name = "lang_key", length = 10)
-    private String langKey;
+    @JsonIgnore
+    @NotNull
+    @Size(min = 60, max = 60)
+    @Column(length = 60, nullable = false)
+    private String password;
 
     @Size(max = 256)
     @Column(name = "image_url", length = 256)
@@ -87,6 +98,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @BatchSize(size = 20)
     private Set<Authority> authorities = new HashSet<>();
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -98,11 +110,12 @@ public class User extends AbstractAuditingEntity implements Serializable {
     public String getUsername() {
         return username;
     }
-    // Lowercase the login before saving it in database
+
     public void setUsername(String username) {
         this.username = StringUtils.lowerCase(username, Locale.ENGLISH);;
     }
 
+    @Override
     public String getPassword() {
         return password;
     }
@@ -143,6 +156,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
         this.imageUrl = imageUrl;
     }
 
+    @Override
     public boolean isActivated() {
         return activated;
     }
@@ -175,20 +189,38 @@ public class User extends AbstractAuditingEntity implements Serializable {
         this.resetDate = resetDate;
     }
 
-    public String getLangKey() {
-        return langKey;
-    }
-
-    public void setLangKey(String langKey) {
-        this.langKey = langKey;
-    }
-
+    @Override
     public Set<Authority> getAuthorities() {
         return authorities;
     }
 
     public void setAuthorities(Set<Authority> authorities) {
         this.authorities = authorities;
+    }
+
+    @Override
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(AccountType accountType) {
+        this.accountType = accountType;
+    }
+
+    public Long getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(Long tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     @Override
@@ -208,18 +240,24 @@ public class User extends AbstractAuditingEntity implements Serializable {
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
         return "User{" +
-            "username='" + username + '\'' +
-            ", firstName='" + firstName + '\'' +
-            ", lastName='" + lastName + '\'' +
-            ", email='" + email + '\'' +
-            ", imageUrl='" + imageUrl + '\'' +
-            ", activated='" + activated + '\'' +
-            ", langKey='" + langKey + '\'' +
-            ", activationKey='" + activationKey + '\'' +
-            "}";
+                "id=" + id +
+                ", accountType=" + accountType +
+                ", username='" + username + '\'' +
+                ", tenantId=" + tenantId +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", activated=" + activated +
+                ", password='" + password + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", activationKey='" + activationKey + '\'' +
+                ", resetKey='" + resetKey + '\'' +
+                ", resetDate=" + resetDate +
+                ", authorities=" + authorities +
+                '}';
     }
 }

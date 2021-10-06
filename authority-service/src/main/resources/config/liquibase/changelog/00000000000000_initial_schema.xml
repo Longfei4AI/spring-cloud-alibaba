@@ -17,8 +17,8 @@
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="uid" type="varchar(255)">
-                <constraints unique="true" nullable="true"/>
+            <column name="account_type" type="int">
+                <constraints nullable="false"/>
             </column>
             <column name="username" type="varchar(50)">
                 <constraints unique="true" nullable="false" uniqueConstraintName="ux_user_username"/>
@@ -30,7 +30,7 @@
                 <constraints unique="true" nullable="true" uniqueConstraintName="ux_user_email"/>
             </column>
             <column name="phone" type="varchar(50)">
-                <constraints nullable="true" />
+                <constraints unique="true" nullable="true" uniqueConstraintName="ux_user_phone"/>
             </column>
             <column name="first_name" type="varchar(50)"/>
             <column name="last_name" type="varchar(50)"/>
@@ -39,21 +39,46 @@
             <column name="activated" type="boolean" valueBoolean="false">
                 <constraints nullable="false" />
             </column>
-            <column name="division_id" type="bigint">
-                <constraints nullable="true" />
+            <column name="password" type="varchar(60)"/>
+            <column name="activation_key" type="varchar(20)"/>
+            <column name="reset_key" type="varchar(20)"/>
+            <column name="reset_date" type="timestamp"/>
+
+            <column name="created_by" type="varchar(50)">
+                <constraints nullable="false"/>
             </column>
-            <column name="credit" type="bigint" defaultValue="0">
-                <constraints nullable="true" />
+            <column name="created_date" type="timestamp" defaultValueDate="${now}"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </createTable>
+
+        <createTable tableName="user_admin">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="bulk_credit" type="bigint" defaultValue="0">
-                <constraints nullable="true" />
+            <column name="account_type" type="int">
+                <constraints nullable="false"/>
             </column>
-            <column name="lang_key" type="varchar(10)"/>
-            <column name="note" type="varchar(255)">
-                <constraints nullable="true" />
+            <column name="username" type="varchar(50)">
+                <constraints unique="true" nullable="false" uniqueConstraintName="ux_user_admin_username"/>
+            </column>
+            <column name="tenant_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="email" type="varchar(100)">
+                <constraints unique="true" nullable="true" uniqueConstraintName="ux_user_admin_email"/>
+            </column>
+            <column name="phone" type="varchar(50)">
+                <constraints unique="true" nullable="true" uniqueConstraintName="ux_user_admin_phone"/>
+            </column>
+            <column name="first_name" type="varchar(50)"/>
+            <column name="last_name" type="varchar(50)"/>
+            <column name="full_name" type="varchar(100)"/>
+            <column name="image_url" type="varchar(256)"/>
+            <column name="activated" type="boolean" valueBoolean="false">
+                <constraints nullable="false" />
             </column>
             <column name="password" type="varchar(60)"/>
-
             <column name="activation_key" type="varchar(20)"/>
             <column name="reset_key" type="varchar(20)"/>
             <column name="reset_date" type="timestamp"/>
@@ -81,9 +106,20 @@
             </column>
         </createTable>
 
+        <createTable tableName="user_admin_authority">
+            <column name="user_admin_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authority_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
         <addPrimaryKey columnNames="user_id, authority_name" tableName="user_authority"/>
 
-        <addForeignKeyConstraint baseColumnNames="authority_name"
+        <addPrimaryKey columnNames="user_admin_id, authority_name" tableName="user_admin_authority"/>
+
+        <!--<addForeignKeyConstraint baseColumnNames="authority_name"
                                  baseTableName="user_authority"
                                  constraintName="fk_authority_name"
                                  referencedColumnNames="name"
@@ -93,11 +129,11 @@
                                  baseTableName="user_authority"
                                  constraintName="fk_user_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="user"/>
+                                 referencedTableName="user"/>-->
 
-        <addNotNullConstraint   columnName="password"
+        <!--<addNotNullConstraint   columnName="password"
                                 columnDataType="varchar(60)"
-                                tableName="user"/>
+                                tableName="user"/>-->
             
         <loadData
                   file="config/liquibase/data/user.csv"
@@ -106,8 +142,18 @@
             <column name="activated" type="boolean"/>
             <column name="created_date" type="timestamp"/>
         </loadData>
+
+        <loadData
+                file="config/liquibase/data/user_admin.csv"
+                separator=";"
+                tableName="user_admin">
+            <column name="activated" type="boolean"/>
+            <column name="created_date" type="timestamp"/>
+        </loadData>
            
         <dropDefaultValue tableName="user" columnName="created_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="user_admin" columnName="created_date" columnDataType="${datetimeType}"/>
+
         <loadData
                   file="config/liquibase/data/authority.csv"
                   separator=";"
@@ -121,9 +167,16 @@
                   tableName="user_authority">
             <column name="user_id" type="numeric"/>
         </loadData>
+        <loadData
+                file="config/liquibase/data/user_admin_authority.csv"
+                separator=";"
+                tableName="user_admin_authority">
+            <column name="user_admin_id" type="numeric"/>
+        </loadData>
+
     </changeSet>
 
-    <changeSet author="jhipster" id="00000000000002" context="test">
+    <!--<changeSet author="jhipster" id="00000000000002" context="test">
         <createTable tableName="date_time_wrapper">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="date_time_wrapperPK"/>
@@ -136,7 +189,7 @@
             <column name="offset_time" type="time"/>
             <column name="local_date" type="date"/>
         </createTable>
-    </changeSet>
+    </changeSet>-->
 
     <!-- Manage the OAuth authentication -->
     <changeSet id="00000000000003" author="jhipster">

@@ -6,14 +6,13 @@ import com.altomni.apn.authority.exception.EmailAlreadyUsedException;
 import com.altomni.apn.authority.exception.LoginAlreadyUsedException;
 import com.altomni.apn.authority.repository.UserRepository;
 import com.altomni.apn.authority.service.UserService;
-import com.altomni.apn.authority.service.dto.AdminUserDTO;
+import com.altomni.apn.authority.service.dto.UserDTO;
 import com.altomni.apn.common.config.AuthoritiesConstants;
 import com.altomni.apn.common.errors.BadRequestAlertException;
 import com.altomni.apn.common.utils.HeaderUtil;
 import com.altomni.apn.common.utils.PaginationUtil;
 import com.altomni.apn.common.utils.ResponseUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,12 +24,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,42 +55,24 @@ import java.util.Optional;
  * </ul>
  * <p>
  * Another option would be to have a specific JPA entity graph to handle this case.
+ * @author longfeiwang
  */
+@Slf4j
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/v3")
 public class UserResource {
 
-    private static final List<String> ALLOWED_ORDERED_PROPERTIES = Collections.unmodifiableList(
-        Arrays.asList(
-            "id",
-            "login",
-            "firstName",
-            "lastName",
-            "email",
-            "activated",
-            "langKey",
-            "createdBy",
-            "createdDate",
-            "lastModifiedBy",
-            "lastModifiedDate"
-        )
-    );
-
-    private final Logger log = LoggerFactory.getLogger(UserResource.class);
+    private static final List<String> ALLOWED_ORDERED_PROPERTIES = List.of("id", "username", "firstName", "lastName", "email", "activated", "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate");
 
     @Value("${spring.application.name}")
     private String applicationName;
 
-    private final UserService userService;
+    @Resource
+    private UserService userService;
 
-    private final UserRepository userRepository;
+    @Resource
+    private UserRepository userRepository;
 
-    //private final MailService mailService;
-
-    public UserResource(UserService userService, UserRepository userRepository) {
-        this.userService = userService;
-        this.userRepository = userRepository;
-    }
 
     /**
      * {@code POST  /admin/users}  : Creates a new user.
@@ -108,12 +88,11 @@ public class UserResource {
      */
     @PostMapping("/users")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<User> createUser(@Valid @RequestBody AdminUserDTO userDTO) throws URISyntaxException {
+    public ResponseEntity<User> createUser(@Valid @RequestBody UserDTO userDTO) throws URISyntaxException {
         log.debug("REST request to save User : {}", userDTO);
 
         if (userDTO.getId() != null) {
             throw new BadRequestAlertException("A new user cannot already have an ID", "userManagement", "idexists");
-            // Lowercase the user login before comparing with database
         } else if (userRepository.findOneByUsername(userDTO.getUsername().toLowerCase()).isPresent()) {
             throw new LoginAlreadyUsedException();
         } else if (userRepository.findOneByEmailIgnoreCase(userDTO.getEmail()).isPresent()) {
@@ -138,7 +117,7 @@ public class UserResource {
      */
     @PutMapping("/users")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<AdminUserDTO> updateUser(@Valid @RequestBody AdminUserDTO userDTO) {
+    public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UserDTO userDTO) {
         log.debug("REST request to update User : {}", userDTO);
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
         if (existingUser.isPresent() && (!existingUser.get().getId().equals(userDTO.getId()))) {
@@ -148,7 +127,7 @@ public class UserResource {
         if (existingUser.isPresent() && (!existingUser.get().getId().equals(userDTO.getId()))) {
             throw new LoginAlreadyUsedException();
         }
-        Optional<AdminUserDTO> updatedUser = userService.updateUser(userDTO);
+        Optional<UserDTO> updatedUser = userService.updateUser(userDTO);
 
         return ResponseUtil.wrapOrNotFound(
             updatedUser,
@@ -164,13 +143,13 @@ public class UserResource {
      */
     @GetMapping("/users")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<List<AdminUserDTO>> getAllUsers(Pageable pageable) {
-        log.debug("REST request to get all User for an admin");
+    public ResponseEntity<List<UserDTO>> getAllUsers(Pageable pageable) {
+        log.debug("REST request to get all Users");
         if (!onlyContainsAllowedProperties(pageable)) {
             return ResponseEntity.badRequest().build();
         }
 
-        final Page<AdminUserDTO> page = userService.getAllManagedUsers(pageable);
+        final Page<UserDTO> page = userService.getAllManagedUsers(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -187,9 +166,9 @@ public class UserResource {
      */
     @GetMapping("/users/{login}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<AdminUserDTO> getUser(@PathVariable @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
+    public ResponseEntity<UserDTO> getUser(@PathVariable @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
         log.debug("REST request to get User : {}", login);
-        return ResponseUtil.wrapOrNotFound(userService.getUserWithAuthoritiesByLogin(login).map(AdminUserDTO::new));
+        return ResponseUtil.wrapOrNotFound(userService.getUserWithAuthoritiesByLogin(login).map(user -> new UserDTO((User) user)));
     }
 
     /**

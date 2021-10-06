@@ -18,6 +18,16 @@ public class JobDTO implements Serializable {
 
     private Integer status;
 
+    public JobDTO() {
+    }
+
+    public JobDTO(Long id, String title, Integer candidates, Integer status) {
+        this.id = id;
+        this.title = title;
+        this.candidates = candidates;
+        this.status = status;
+    }
+
     public Long getId() {
         return id;
     }

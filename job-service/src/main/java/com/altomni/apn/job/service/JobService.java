@@ -4,13 +4,22 @@ import com.altomni.apn.job.domain.Job;
 import com.altomni.apn.job.repository.JobRepository;
 import com.altomni.apn.job.service.dto.JobDTO;
 import com.altomni.apn.job.service.mapper.JobMapper;
+import feign.RequestTemplate;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -22,14 +31,17 @@ public class JobService {
 
     private final Logger log = LoggerFactory.getLogger(JobService.class);
 
-    private final JobRepository jobRepository;
+    @Resource
+    private JobRepository jobRepository;
 
-    private final JobMapper jobMapper;
+    @Resource
+    private JobMapper jobMapper;
 
-    public JobService(JobRepository jobRepository, JobMapper jobMapper) {
-        this.jobRepository = jobRepository;
-        this.jobMapper = jobMapper;
-    }
+    @Resource
+    private CompanyService companyService;
+
+    @Resource
+    private RestTemplate restTemplate;
 
     /**
      * Save a job.
@@ -42,6 +54,24 @@ public class JobService {
         Job job = jobMapper.toEntity(jobDTO);
         job = jobRepository.save(job);
         return jobMapper.toDto(job);
+    }
+
+    @GlobalTransactional
+    public ResponseEntity<Object> saveTestSuccess(JobDTO jobDTO) {
+        log.info("Request to save Job : {}", jobDTO);
+        Job job = jobMapper.toEntity(jobDTO);
+        jobRepository.save(job);
+        ResponseEntity<Object> response = companyService.saveCompany();
+        return response;
+    }
+
+    @GlobalTransactional
+    public ResponseEntity<Object> saveTestRollback(JobDTO jobDTO) {
+        log.info("Request to save Job : {}", jobDTO);
+        Job job = jobMapper.toEntity(jobDTO);
+        jobRepository.save(job);
+        ResponseEntity<Object> response = companyService.saveCompanyRollback();
+        return response;
     }
 
     /**

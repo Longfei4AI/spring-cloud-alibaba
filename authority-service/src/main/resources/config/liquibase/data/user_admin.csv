@@ -1,0 +1,2 @@
+id;account_type;username;tenant_id;email;phone;first_name;last_name;full_name;image_url;activated;password;activation_key;reset_key;reset_date;created_by;created_date;last_modified_by;last_modified_date
+1;1;longfei;1;longfei.wang@altomni.com;7202972408;Longfei;Wang;Longfei Wang;;true;$2a$10$pgDeeVJie8UVGXJ9itCoguuW0UT27Mr8ZvlTSG1LpaRvGq4treMnG;;;2021-09-17 10:10:10;system;;system;2021-09-17 10:10:10

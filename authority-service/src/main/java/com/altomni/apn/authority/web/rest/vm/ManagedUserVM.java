@@ -1,13 +1,13 @@
 package com.altomni.apn.authority.web.rest.vm;
 
-import com.altomni.apn.authority.service.dto.AdminUserDTO;
+import com.altomni.apn.authority.service.dto.UserDTO;
 
 import javax.validation.constraints.Size;
 
 /**
  * View Model extending the AdminUserDTO, which is meant to be used in the user management UI.
  */
-public class ManagedUserVM extends AdminUserDTO {
+public class ManagedUserVM extends UserDTO {
 
     public static final int PASSWORD_MIN_LENGTH = 4;
 

@@ -25,19 +25,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManager();
     }
 
-    /*@Bean
-    public UserDetailsService getUserDetailsService(){
-        InMemoryUserDetailsManager userDetailsManager = new InMemoryUserDetailsManager(
-                User.withUsername("longfei").password(this.passwordEncoder.encode("123456")).authorities("candidate", "company").build(),
-                User.withUsername("manager").password(this.passwordEncoder.encode("manager")).authorities("job").build());
-        return userDetailsManager;
-    }*/
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/v3/login").permitAll()
+                .antMatchers("/api/v3/account/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin();

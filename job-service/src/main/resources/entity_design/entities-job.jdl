@@ -2,7 +2,7 @@
 
 */
 entity Job {
-	title String required
+	title String required /** description */
     candidates Integer
     status Integer
 }
@@ -16,4 +16,3 @@ dto * with mapstruct
 // service all with serviceImpl
 
 service all with serviceClass
-
