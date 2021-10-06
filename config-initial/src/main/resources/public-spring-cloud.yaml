@@ -6,7 +6,7 @@ spring:
         namespace: dev
     sentinel:
       transport:
-        dashboard: localhost:8088
+        dashboard: localhost:8090
         port: 8720
       datasource:
         ds1:
@@ -26,11 +26,15 @@ spring:
 feign:
   sentinel:
     enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 600000
+        readTimeout: 600000
 
 seata:
   enabled: true
   tx-service-group: apn_tx_group
-  enable-auto-data-source-proxy: true
   config:
     type: nacos
     nacos:
