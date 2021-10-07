@@ -1,0 +1,9 @@
+spring:
+  boot:
+    admin:
+      client:
+        url: http://localhost/admin
+        instance:
+          prefer-ip: true
+        username: ${spring.security.user.name}
+        password: ${spring.security.user.password}

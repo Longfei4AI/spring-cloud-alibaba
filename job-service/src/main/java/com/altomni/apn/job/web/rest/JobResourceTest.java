@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
+/**
+ * @author longfeiwang
+ */
 @RestController
 @Slf4j
 @RequestMapping("/api/v3")
@@ -44,5 +47,12 @@ public class JobResourceTest {
         log.info("request to save job rollback ----");
         log.info(SecurityUtils.getCurrentUserLogin().toString());
         return jobService.saveTestRollback(new JobDTO(null, "test title rollback", 10, 1));
+    }
+
+    @GetMapping("/test-admin")
+    public ResponseEntity<String> getAdmin(){
+        log.info("request to get admin ----");
+        log.info(SecurityUtils.getCurrentUserLogin().toString());
+        return ResponseEntity.ok("Success");
     }
 }

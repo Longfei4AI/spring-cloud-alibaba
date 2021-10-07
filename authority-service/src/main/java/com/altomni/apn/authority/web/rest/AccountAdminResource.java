@@ -29,6 +29,7 @@ import java.util.Optional;
 
 /**
  * REST controller for managing the current user's account.
+ * @author longfeiwang
  */
 @Slf4j
 @RestController

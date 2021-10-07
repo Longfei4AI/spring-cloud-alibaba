@@ -32,6 +32,9 @@ public abstract class UserSecurityService {
     @Value("${spring.application.name}")
     private String service;
 
+    @Value("${server.servlet.context-path}")
+    private String contextPath;
+
     @Resource
     private RestTemplate restTemplate;
 
@@ -46,7 +49,7 @@ public abstract class UserSecurityService {
                 throw new CustomParameterizedException("Inactive user is not allowed to login");
             }
             try {
-                String tokenUrl = String.format("http://%s/authority/oauth/token", service);
+                String tokenUrl = String.format("http://%s%s/oauth/token", service, contextPath);
                 log.info(tokenUrl);
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);

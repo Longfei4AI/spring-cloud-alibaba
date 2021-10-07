@@ -1,5 +1,7 @@
 server:
-  port: 80
+  port: 8888
+  servlet:
+    context-path: /
 
 spring:
   cloud:
@@ -34,3 +36,7 @@ spring:
           uri: lb://authority-service
           predicates:
             - Path=/authority/**
+        - id: admin-routh
+          uri: lb://admin-service
+          predicates:
+            - Path=/admin/**

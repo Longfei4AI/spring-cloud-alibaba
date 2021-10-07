@@ -1,13 +1,13 @@
 package com.altomni.apn.job.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
 import com.altomni.apn.common.config.AuthoritiesConstants;
 import com.altomni.apn.common.dto.LoginUserDTO;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -35,7 +35,14 @@ public final class SecurityUtils {
         if (authentication == null) {
             return null;
         }
-        return JSON.parseObject(authentication.getPrincipal().toString(), LoginUserDTO.class);
+        try {
+            return JSON.parseObject(authentication.getPrincipal().toString(), LoginUserDTO.class);
+        }catch (JSONException e){
+            
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

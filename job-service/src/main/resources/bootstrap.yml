@@ -8,5 +8,5 @@ spring:
         file-extension: yaml
         #prefix: application
         namespace: ${namespace:dev}
-        shared-configs: public-spring-cloud.yaml,public-datasource.yaml
+        shared-configs: public-spring-cloud.yaml,public-seata.yaml,public-datasource.yaml,public-actuator.yaml
         refresh-enabled: true

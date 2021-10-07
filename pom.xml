@@ -15,6 +15,7 @@
         <module>common</module>
         <module>authority-service</module>
         <module>config-initial</module>
+        <module>admin-service</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -360,6 +361,12 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-redis</artifactId>
                 <version>2.1.10.RELEASE</version>
+            </dependency>
+
+            <dependency>
+                <groupId>de.codecentric</groupId>
+                <artifactId>spring-boot-admin-starter-server</artifactId>
+                <version>2.5.0</version>
             </dependency>
 
         </dependencies>

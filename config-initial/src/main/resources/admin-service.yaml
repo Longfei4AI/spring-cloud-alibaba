@@ -1,0 +1,15 @@
+server:
+  port: 8000
+  servlet:
+    context-path: /admin
+
+spring:
+  security:
+    user:
+      name: apn
+      password: apn
+
+  boot:
+    admin:
+      ui:
+        title: APN Admin Monitor

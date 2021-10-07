@@ -2,6 +2,7 @@ package com.altomni.apn.job.interceptor;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * pass token between microservices
+ * @author longfeiwang
  */
 @Component
 public class FeignClientInterceptor implements RequestInterceptor {
@@ -21,7 +23,9 @@ public class FeignClientInterceptor implements RequestInterceptor {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     if (authentication != null && authentication.getDetails() instanceof OAuth2AuthenticationDetails) {
       OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) authentication.getDetails();
-      requestTemplate.header(AUTHORIZATION_HEADER, String.format("%s %s", TOKEN_TYPE, details.getTokenValue()));
+      if (StringUtils.isNotEmpty(details.getTokenValue())) {
+        requestTemplate.header(AUTHORIZATION_HEADER, String.format("%s %s", TOKEN_TYPE, details.getTokenValue()));
+      }
     }
   }
 }

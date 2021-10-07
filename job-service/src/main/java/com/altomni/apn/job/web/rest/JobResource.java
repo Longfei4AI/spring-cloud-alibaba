@@ -27,9 +27,10 @@ import java.util.Optional;
 
 /**
  * REST controller for managing {@link com.altomni.apn.job.domain.Job}.
+ * @author longfeiwang
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v3")
 public class JobResource {
 
     private final Logger log = LoggerFactory.getLogger(JobResource.class);

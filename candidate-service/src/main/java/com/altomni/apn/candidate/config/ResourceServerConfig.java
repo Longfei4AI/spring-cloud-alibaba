@@ -27,6 +27,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
+                .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/**")
                 .access("#oauth2.hasAnyScope('read', 'write')")
                 .and().csrf().disable()

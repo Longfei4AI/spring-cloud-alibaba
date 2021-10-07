@@ -183,7 +183,7 @@
 
    - Test Login
 
-     Access POST http://localhost/authority/api/v3/login with the request body below:
+     Access POST http://localhost/authority-service/api/v3/login with the request body below:
 
      ```json
      {
@@ -221,7 +221,7 @@
 
    - Test API
 
-     - Access GET http://localhost/job/api/v3/test with Authorization in Request Header, like:
+     - Access GET http://localhost:8888/job/api/v3/test with Authorization in Request Header, like:
 
        Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5c......
 
@@ -240,11 +240,11 @@
 
    - Test global transaction
 
-     - Access POST http://localhost/job/api/v3/save-success with Authorization in Request Header
+     - Access POST http://localhost:8888/job/api/v3/save-success with Authorization in Request Header
 
        To check these 3 database tables job, company and candidate. Succeed if those 3 tables got one new record respectively.
 
-     - Access POST http://localhost/job/api/v3/save-rollback with Authorization in Request Header
+     - Access POST http://localhost:8888/job/api/v3/save-rollback with Authorization in Request Header
 
        Succeed if those 3 tables have no new record inserted.
 
