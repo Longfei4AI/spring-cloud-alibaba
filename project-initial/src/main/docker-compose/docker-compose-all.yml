@@ -1,0 +1,116 @@
+# docker-compose -f docker-compose-all.yml up -d
+version: '3.0'
+services:
+  redis: 
+    image: redis
+    container_name: apn-redis
+    restart: always
+    #volumes:
+    #  - ../app-volumes/redis/data:/data
+    environment:
+      - REDIS_PASSWORD=
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+        #reservations:
+        #  memory: 128M
+
+  mysql:
+    image: mysql/mysql-server:latest
+    container_name: apn-mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - "../sql/apn-init.sql:/docker-entrypoint-initdb.d/apn-init.sql"
+    #  - ../app-volumes/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_ROOT_HOST: '%'
+
+  mongodb:
+    image: mongo
+    container_name: apn-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    #volumes:
+    #  - ../app-volumes/mongodb:/data/db
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: apn-rabbitmq
+    restart: always
+    #volumes:
+    #  - ../app-volumes/rabbitmq:/var/lib/rabbitmq/mnesia
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: apn
+      RABBITMQ_DEFAULT_PASS: apn
+
+  nacos:
+    image: zill057/nacos-server-apple-silicon:2.0.3  # Only for Mac with M1. Others: nacos/nacos-server:2.0.2
+    container_name: apn-nacos
+    restart: always
+    #volumes:
+    #  - ../app-volumes/nacos/:/home/nacos/
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+      - "9849:9849"
+    environment:
+      MODE: standalone
+    deploy:
+      resources:
+        limits:
+          memory: 2048M
+
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: apn-zipkin
+    restart: always
+    ports:
+      - "9411:9411"
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+
+  sentinel:
+    image: sentinel # minghealtomni/sentinel-dashboard-1.8.2
+    container_name: apn-sentinel
+    restart: always
+    ports:
+      - "8090:8080"
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+
+  seata:
+    image: seata:1.4.0
+    container_name: apn-seata
+    restart: always
+    volumes:
+      - ../app-volumes/seata/conf/registry.conf:/apn/seata/conf/registry.conf
+      - ../app-volumes/seata/conf/file.conf:/apn/seata/conf/file.conf
+      #- "../script/init-nacos-config.sh:/init-nacos-config.sh"
+      #- "../resources/:/resources/"
+    ports:
+      - "8091:8091"
+    #depends_on:
+    #  - nacos
+    #entrypoint: "sh /init-nacos-config.sh -t dev -h host.docker.internal"
+    command: "sh seata/bin/seata-server.sh -p 8091 -h '123.123.123.121' -m redis"
+    environment:
+      - IP=192.168.0.5
+    deploy:
+      resources:
+        limits:
+          memory: 2048M

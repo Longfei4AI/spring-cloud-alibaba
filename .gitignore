@@ -36,3 +36,8 @@ hs_err_pid*
 .DS_Store
 *.log*
 
+project-initial/src/main/app-volumes/mongodb
+project-initial/src/main/app-volumes/rabbitmq
+project-initial/src/main/app-volumes/mysql
+project-initial/src/main/app-volumes/redis
+

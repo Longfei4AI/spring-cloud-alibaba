@@ -1,16 +1,18 @@
 # spring-cloud-alibaba
 
+docker rm -f apn-nacos apn-mysql apn-mongodb apn-redis apn-zipkin apn-seata apn-rabbitmq apn-sentinel
+
 1. Install Nacos
 
    - Mac with M1: 
 
      ```shell
-     docker run --name nacos -e MODE=standalone -p 8848:8848 -p 9848:9848 -p 9849:9849 -d zill057/nacos-server-apple-silicon:2.0.3
+     docker run --name nacos-3 -e MODE=standalone -p 8848:8848 -p 9848:9848 -p 9849:9849 -d zill057/nacos-server-apple-silicon:2.0.3
 
    - Others: 
 
      ```shell
-     docker run --name nacos -e MODE=standalone -p 8848:8848 -p 9848:9848 -p 9849:9849  -d nacos/nacos-server:2.0.2
+     docker run --name nacos-2 -e MODE=standalone -p 8848:8848 -p 9848:9848 -p 9849:9849  -d nacos/nacos-server:2.0.2
      ```
 
    - Visit dashboard: http://localhost:8848/nacos
@@ -41,6 +43,9 @@
 
        ```shell
        docker run -d -p 8090:8080 --name sentinel-dashboard minghealtomni/sentinel-dashboard-1.8.2
+       
+       docker build -t sentinel .
+       docker run -d -p 8090:8080 --name sentinel sentinel
        ```
 
    - Visit dashboard: http://localhost:8090/#/dashboard/home
@@ -112,17 +117,19 @@
 
    - Download Seata Or using docker
 
-     - Download jar: https://github.com/seata/seata/releases/tag/v1.4.0
+     - Download: https://github.com/seata/seata/releases/tag/v1.4.0
 
      - Using docker [It does not work using my Mac with M1 chip]
 
        ```dockerfile
-       1. docker run -d --name seata-server -p 8091:8091 seataio/seata-server:1.4.0
+       1. docker run -it --name seata -p 8091:8091 -e STORE_MODE=redis -e SEATA_CONFIG_NAME=file:/root/seata-config/registry -v /Users/longfeiwang/seata/config/:/root/seata-config seataio/seata-server:1.4.0 bash
        2. docker cp seata-server:/seata-server/resources /Users/mydir/seata/
        3. docker rm -f seata-server
        4. docker run -d --name seata-server -p 8091:8091 -v /Users/mydir/seata/resources:/seata-server/resources seataio/seata-server:1.4.0
+       
+       
        ```
-
+       
        
 
    - Set up config

@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 #  -*- coding: UTF-8 -*-
 
-# python3 nacos_config.py -dev
+# python3 init-nacos-config.py -t dev [dev|staging|prod]
 
 import http.client
 import sys
 import getopt as opts
 import urllib.parse
 import glob
-
 
 def get_params() -> dict:
     params = {
@@ -39,6 +38,20 @@ hasError = False
 params = get_params()
 
 url_prefix = f"{params['-h']}:{params['-p']}"
+
+def init_namespace(customNamespaceId, namespaceName, namespaceDesc):
+    url_post = f'/nacos/v1/console/namespaces?customNamespaceId={urllib.parse.quote(customNamespaceId)}&namespaceName={urllib.parse.quote(namespaceName)}&namespaceDesc={urllib.parse.quote(namespaceDesc)}'
+    conn = http.client.HTTPConnection(url_prefix)
+    conn.request("POST", url_post, headers=headers)
+    res = conn.getresponse()
+    data = res.read().decode("utf-8")
+    if data != "true":
+        print(f'create namespace: {customNamespaceId} error.')
+
+for ns in ['dev', 'staging', 'prod']:
+    init_namespace(ns, ns, f'Deploy for {ns} environment')
+
+
 tenant = params['-t']
 username = params['-u']
 password = params['-w']

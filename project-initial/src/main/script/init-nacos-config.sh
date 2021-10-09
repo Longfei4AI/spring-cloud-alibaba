@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# sh nacos_config.sh -t dev
+# sh init-nacos-config.sh -t dev
 
 while getopts ":h:p:g:t:u:w:" opt
 do
@@ -55,26 +55,36 @@ contentType="content-type:application/json;charset=UTF-8"
 echo "set nacosAddr=$nacosAddr"
 echo "set group=$group"
 
-urlencode() {
-  length="${#1}"
-  i=0
-  while [ $length -gt $i ]; do
-    char="${1:$i:1}"
-    case $char in
-    [a-zA-Z0-9.~_-]) printf $char ;;
-    *) printf '%%%02X' "'$char" ;;
-    esac
-    i=`expr $i + 1`
-  done
+tempLog=$(mktemp -u)
+function initNamespace(){
+    customNamespaceId="$1"
+    namespaceName="$2"
+    namespaceDesc="$3"
+    curl -X POST -H "${contentType}" -G --data-urlencode "customNamespaceId=$customNamespaceId" --data-urlencode "namespaceName=$namespaceName" --data-urlencode "namespaceDesc=$namespaceDesc" "http://$nacosAddr/nacos/v1/console/namespaces" >"${tempLog}" 2>/dev/null
+    if [ -z $(cat "${tempLog}") ]; then
+      echo " Please check the cluster status. "
+      exit 1
+    fi
+    result=$(cat "$tempLog")
+    if [[ "$result" == "true" ]]; then
+      echo "Set $1 successfully "
+    else
+      echo "Set $1 failure "
+    fi
 }
+
+for ns in 'dev' 'staging' 'prod'; do
+	initNamespace "${ns}" "${ns}" "Deploy for ${ns} environment"
+done
+
 
 failCount=0
 tempLog=$(mktemp -u)
 function addConfig() {
-  dataId=`urlencode $1`
-  content=`urlencode $2`
-  type=`urlencode $3`
-  curl -X POST -H "${contentType}" "http://$nacosAddr/nacos/v1/cs/configs?dataId=$dataId&group=$group&type=$type&content=$content&tenant=$tenant&username=$username&password=$password" >"${tempLog}" 2>/dev/null
+  dataId="$1"
+  content="$2"
+  type="$3"
+  curl -X POST -H "${contentType}" -G --data-urlencode "dataId=$dataId" --data-urlencode "group=$group" --data-urlencode "type=$type" --data-urlencode "content=$content" --data-urlencode "tenant=$tenant" --data-urlencode "username=$username" --data-urlencode "password=$password" "http://$nacosAddr/nacos/v1/cs/configs" >"${tempLog}" 2>/dev/null
   if [ -z $(cat "${tempLog}") ]; then
     echo " Please check the cluster status. "
     exit 1
@@ -94,7 +104,7 @@ for file in ../resources/*; do
 	key=${file#*/*/}
   value=$(cat $(dirname "$PWD")/resources/"$key")
   type=${key#*.}
-  #echo "$key, $type, $count"
+  #echo "$key, $value, $count"
 	addConfig "${key}" "${value}" "${type}"
 done
 
