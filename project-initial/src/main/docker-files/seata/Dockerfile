@@ -6,4 +6,4 @@ ADD code seata
 ENV IP=192.168.0.4
 EXPOSE 8091
 
-#CMD ["sh", "seata/bin/seata-server.sh", "-p", "8091", "-h", "192.168.0.4", "-m", "redis"]
+CMD ["sh", "seata/bin/seata-server.sh", "-p", "8091", "-h", "${IP}", "-m", "redis"]

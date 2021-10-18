@@ -54,8 +54,25 @@ services:
       RABBITMQ_DEFAULT_USER: apn
       RABBITMQ_DEFAULT_PASS: apn
 
+  nacos-m1:
+    image: zill057/nacos-server-apple-silicon:2.0.3
+    container_name: apn-nacos
+    restart: always
+    #volumes:
+    #  - ../app-volumes/nacos/:/home/nacos/
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+      - "9849:9849"
+    environment:
+      MODE: standalone
+    deploy:
+      resources:
+        limits:
+          memory: 2048M
+
   nacos:
-    image: zill057/nacos-server-apple-silicon:2.0.3  # Only for Mac with M1. Others: nacos/nacos-server:2.0.2
+    image: nacos/nacos-server:2.0.2
     container_name: apn-nacos
     restart: always
     #volumes:
@@ -82,8 +99,8 @@ services:
         limits:
           memory: 1024M
 
-  sentinel:
-    image: sentinel # minghealtomni/sentinel-dashboard-1.8.2
+  sentinel-m1:
+    image: minghealtomni/sentinel-dashboard-m1:1.8.2
     container_name: apn-sentinel
     restart: always
     ports:
@@ -93,23 +110,53 @@ services:
         limits:
           memory: 1024M
 
-  seata:
-    image: seata:1.4.0
+  sentinel:
+    image: minghealtomni/sentinel-dashboard-1.8.2
+    container_name: apn-sentinel
+    restart: always
+    ports:
+      - "8090:8080"
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+
+
+  seata-m1:
+    image: fancyfong/seata:1.4.1_arm64
     container_name: apn-seata
     restart: always
     volumes:
-      - ../app-volumes/seata/conf/registry.conf:/apn/seata/conf/registry.conf
-      - ../app-volumes/seata/conf/file.conf:/apn/seata/conf/file.conf
-      #- "../script/init-nacos-config.sh:/init-nacos-config.sh"
-      #- "../resources/:/resources/"
+      - ../app-volumes/seata/conf:/root/seata-config
+    ports:
+      - "8091:8091"
+    environment:
+      - SEATA_IP=192.168.0.6
+      - SEATA_PORT=8091
+      - STORE_MODE=redis
+      - SEATA_CONFIG_NAME=file:/root/seata-config/registry
+    deploy:
+      resources:
+        limits:
+          memory: 2048M
+
+  seata:
+    image: seataio/seata-server:1.4.0
+    container_name: apn-seata
+    restart: always
+    volumes:
+      - ../app-volumes/seata/conf:/root/seata-config
     ports:
       - "8091:8091"
     #depends_on:
     #  - nacos
     #entrypoint: "sh /init-nacos-config.sh -t dev -h host.docker.internal"
-    command: "sh seata/bin/seata-server.sh -p 8091 -h '123.123.123.121' -m redis"
+    #command: "sh seata/bin/seata-server.sh -p 8091 -h 192.168.0.4 -m redis"
     environment:
-      - IP=192.168.0.5
+      - SEATA_IP=192.168.0.6
+      - SEATA_PORT=8091
+      - STORE_MODE=redis
+      - SEATA_CONFIG_NAME=file:/root/seata-config/registry
     deploy:
       resources:
         limits:

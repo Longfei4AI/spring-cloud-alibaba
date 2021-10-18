@@ -9,7 +9,7 @@ seata:
       group: DEFAULT_GROUP
       username: nacos
       password: nacos
-      data-id: apn_tx_group.properties
+      #data-id: apn_tx_group.properties
   registry:
     type: nacos
     nacos:

@@ -4,7 +4,6 @@ import com.altomni.apn.company.domain.Company;
 import com.altomni.apn.company.repository.CompanyRepository;
 import com.altomni.apn.company.service.dto.CompanyDTO;
 import com.altomni.apn.company.service.mapper.CompanyMapper;
-import io.seata.spring.annotation.GlobalTransactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -30,7 +29,7 @@ public class CompanyService {
     private final CompanyMapper companyMapper;
 
     @Resource
-    private CandidateService candidateService;
+    private TalentService candidateService;
 
     public CompanyService(CompanyRepository companyRepository, CompanyMapper companyMapper) {
         this.companyRepository = companyRepository;

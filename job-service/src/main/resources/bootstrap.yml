@@ -6,6 +6,8 @@ spring:
       config:
         server-addr: localhost:8848
         file-extension: yaml
+        username: nacos
+        password: nacos
         #prefix: application
         namespace: ${namespace:dev}
         shared-configs: public-spring-cloud.yaml,public-seata.yaml,public-datasource.yaml,public-actuator.yaml

@@ -5,6 +5,8 @@ spring:
     nacos:
       config:
         server-addr: localhost:8848
+        username: nacos
+        password: nacos
         file-extension: yaml
         namespace: ${namespace:dev}
         shared-configs: public-spring-cloud.yaml,public-actuator.yaml

@@ -28,10 +28,10 @@ spring:
           uri: lb://company-service
           predicates:
             - Path=/company/**
-        - id: candidate-routh
-          uri: lb://candidate-service
+        - id: talent-routh
+          uri: lb://talent-service
           predicates:
-            - Path=/candidate/**
+            - Path=/talent/**
         - id: authority-routh
           uri: lb://authority-service
           predicates:

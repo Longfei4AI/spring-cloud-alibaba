@@ -11,7 +11,7 @@
         <module>gateway-service</module>
         <module>company-service</module>
         <module>job-service</module>
-        <module>candidate-service</module>
+        <module>talent-service</module>
         <module>common</module>
         <module>authority-service</module>
         <module>admin-service</module>

@@ -1,6 +1,6 @@
 package com.altomni.apn.company.web.rest;
 
-import com.altomni.apn.company.service.CandidateService;
+import com.altomni.apn.company.service.TalentService;
 import com.altomni.apn.company.service.CompanyService;
 import com.altomni.apn.company.service.dto.CompanyDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ import javax.annotation.Resource;
 public class CompanyResourceTest {
 
     @Resource
-    private CandidateService candidateService;
+    private TalentService candidateService;
 
     @Resource
     private CompanyService companyService;

@@ -35,6 +35,8 @@ hs_err_pid*
 */*.iml
 .DS_Store
 *.log*
+IGNORE_README.md
+apn_tx_group.properties
 
 project-initial/src/main/app-volumes/mongodb
 project-initial/src/main/app-volumes/rabbitmq
