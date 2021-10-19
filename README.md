@@ -4,6 +4,8 @@
 
    - Java 11
    - Maven 1.8.0
+   - Docker 20.10.7
+   - Docker Compose: 1.29.2
 
 2. Installment
 
