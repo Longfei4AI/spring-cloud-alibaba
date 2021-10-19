@@ -1,6 +1,6 @@
 # spring-cloud-alibaba
 
-1. Developemnt environment
+1. Development environment
 
    - Java 11
    - Maven 1.8.0
